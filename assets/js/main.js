@@ -71,41 +71,4 @@
   $$('.gimg').forEach(function (b) { b.addEventListener('click', function () { $('img', lb).src = b.getAttribute('data-full'); $('img', lb).alt = $('img', b).alt; lb.classList.add('open'); }); });
   if (lb) lb.addEventListener('click', function () { lb.classList.remove('open'); });
 
-  // Forms: POST to the endpoint in <meta name="form-endpoint"> (Formspree-style, JSON response).
-  // If no endpoint is configured, or the request fails, fall back to opening the visitor's mail app.
-  var MAIL = 'contact@chaargold.com';
-  var epMeta = $('meta[name="form-endpoint"]'), keyMeta = $('meta[name="form-key"]');
-  var ENDPOINT = epMeta ? epMeta.content : '', KEY = keyMeta ? keyMeta.content : '';
-  function collect(f) {
-    var lines = [], seen = {}, data = {};
-    $$('input,select,textarea', f).forEach(function (el) {
-      if (!el.name || (el.type === 'checkbox' && !el.checked)) return;
-      var label = el.getAttribute('data-label') || el.name;
-      if (el.type === 'checkbox') { (seen[label] = seen[label] || []).push(el.value); return; }
-      if (el.value.trim()) { lines.push(label + ': ' + el.value.trim()); data[label] = el.value.trim(); }
-    });
-    Object.keys(seen).forEach(function (k) { lines.push(k + ': ' + seen[k].join(', ')); data[k] = seen[k].join(', '); });
-    return { lines: lines, data: data };
-  }
-  $$('form[data-enquiry]').forEach(function (f) {
-    var msg = $('.form-msg', f), btn = $('button[type="submit"]', f);
-    var okText = msg ? msg.textContent : '';
-    f.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (!f.checkValidity()) { f.reportValidity(); return; }
-      var c = collect(f), subject = f.getAttribute('data-subject') || 'Website enquiry';
-      function mailto() {
-        location.href = 'mailto:' + MAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(c.lines.join(String.fromCharCode(10)));
-        if (msg) { msg.textContent = 'Your email app should have opened with your request. If it did not, write to ' + MAIL + '.'; msg.classList.add('show'); }
-      }
-      if (!ENDPOINT) return mailto();
-      var payload = Object.assign({ _subject: subject, page: location.href }, c.data);
-      if (KEY) { payload.access_key = KEY; payload.subject = subject; }
-      if (btn) { btn.disabled = true; btn.dataset.t = btn.textContent; btn.textContent = 'Sending…'; }
-      fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload) })
-        .then(function (r) { if (!r.ok) throw new Error(r.status); f.reset(); if (msg) { msg.textContent = okText; msg.classList.add('show'); } })
-        .catch(mailto)
-        .then(function () { if (btn) { btn.disabled = false; btn.textContent = btn.dataset.t; } });
-    });
-  });
 })();

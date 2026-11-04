@@ -329,3 +329,6 @@ fieldset.field{border:0;padding:0;margin:0}
 .bg-ink .tile h3,.bg-ink .card h3{color:var(--ink)}
 .bg-ink .tile p,.bg-ink .card p{color:var(--muted)}
 .tabpanel,[id]{scroll-margin-top:96px}
+.email-box .ico{display:grid;place-items:center;width:52px;height:52px;border-radius:12px;background:var(--ink);color:var(--gold);margin-bottom:1rem}
+.email-box .ico svg{width:26px;height:26px}
+.enq-types{display:flex;flex-wrap:wrap;gap:10px;margin:1.4rem 0}

@@ -2,7 +2,7 @@
 Run from the project root:  python tools/build.py
 Writes the .html pages, sitemap.xml and robots.txt next to this folder's parent.
 Content lives in this file (hand-written pages) and data/*.json (FAQ, Terms, Blog)."""
-import json, os, html
+import json, os, html, urllib.parse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOMAIN = 'https://chaargold.com'
@@ -11,9 +11,7 @@ PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
 INSTAGRAM = '#'   # TODO: paste Instagram profile URL
 FACEBOOK = '#'    # TODO: paste Facebook page URL
-VER = '2'
-FORM_ENDPOINT = ''   # e.g. https://formspree.io/f/xxxxxxx  (leave empty to fall back to email)
-FORM_KEY = ''        # only for Web3Forms-style services (access key)
+VER = '3'
 
 def esc(s): return html.escape(s, quote=False)
 def load(n): return json.load(open(os.path.join(ROOT, 'data', n), encoding='utf-8'))
@@ -101,7 +99,6 @@ def layout(path, title, desc, body, og_img='logo-chaargold', schema=''):
             nav.append('<a href="%s%s"%s>%s</a>' % (base, p, cls(p), n))
     nav = ''.join(nav)
     foot_products = ''.join('<li><a href="%sproducts/%s.html">%s</a></li>' % (base, x['slug'], esc(x['name'])) for x in PRODUCTS)
-    form_meta = ('<meta name="form-endpoint" content="%s">' % FORM_ENDPOINT + ('<meta name="form-key" content="%s">' % FORM_KEY if FORM_KEY else '')) if FORM_ENDPOINT else ''
     full_title = title if title.startswith('ChaarGold') else title + ' | ChaarGold'
     url = DOMAIN + '/' + (path if path != 'index.html' else '')
     return f'''<!doctype html>
@@ -111,7 +108,7 @@ def layout(path, title, desc, body, og_img='logo-chaargold', schema=''):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(full_title)}</title>
 <meta name="description" content="{html.escape(desc)}">
-<meta name="theme-color" content="#bc9c23">{form_meta}
+<meta name="theme-color" content="#bc9c23">
 <link rel="canonical" href="{url}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="ChaarGold">
 <meta property="og:title" content="{html.escape(full_title)}"><meta property="og:description" content="{html.escape(desc)}">
@@ -184,41 +181,16 @@ def table(rows, head=('Parameter', 'Typical Value'), cls=''):
 def head(eyebrow, title, lead='', center=False):
     return '<div class="section-head%s reveal"><span class="eyebrow">%s</span><h2>%s</h2>%s</div>' % (' center' if center else '', eyebrow, title, '<p class="lead">%s</p>' % lead if lead else '')
 
-def field(label, name, typ='text', req=False, ph=''):
-    return '<div class="field"><label for="{n}">{l}{r}</label><input id="{n}" name="{n}" data-label="{l}" type="{t}"{q}{p}></div>'.format(
-        n=name, l=label, t=typ, r=' <i>*</i>' if req else '', q=' required' if req else '', p=' placeholder="%s"' % ph if ph else '')
+def mail(subject, lines=()):
+    """mailto: link with a pre-filled subject and body template."""
+    body = '\n'.join(lines)
+    return 'mailto:%s?subject=%s&body=%s' % (EMAIL, urllib.parse.quote(subject), urllib.parse.quote(body))
 
-def uid(prefix, name): return '%s-%s' % (prefix, name)
-
-def quote_form(pre, selected=''):
-    opts = ''.join('<label class="opt"><input type="checkbox" name="products" data-label="Products of interest" value="%s"%s> %s</label>' %
-                   (html.escape(n), ' checked' if n == selected else '', esc(n)) for n in
-                   ['Lump Charcoal', 'Hexagonal Briquettes', 'Pillow Briquettes', 'Honeycomb Briquettes', 'Biochar', 'Wood Vinegar', 'Charcoal Briquette Stoves', 'Pyrolysis Kilns & Retort Systems'])
-    return f'''<form class="form" data-enquiry data-subject="Quote request — ChaarGold website" novalidate>
-  <fieldset class="field"><legend>Products of interest <small>(select all that apply)</small></legend><div class="opts">{opts}</div></fieldset>
-  <div class="row">{field('Name', pre + 'name', req=True)}{field('Company Name', pre + 'company')}</div>
-  <div class="row">{field('Email Address', pre + 'email', 'email')}{field('Phone Number', pre + 'phone', 'tel', True)}</div>
-  <div class="field"><label for="{pre}msg">Tell us about your requirement</label><textarea id="{pre}msg" name="message" data-label="Requirement"></textarea></div>
-  <div><button class="btn btn-gold" type="submit">Submit {icon('arrow')}</button></div>
-  <p class="form-msg" role="status">Thank you — your email app should have opened with your request. If it didn't, write to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
-</form>'''
-
-def callback_form(pre):
-    return f'''<form class="form" data-enquiry data-subject="Call back request — ChaarGold website">
-  <div class="row">{field('Name', pre + 'name', req=True)}{field('Contact Number', pre + 'phone', 'tel', True)}</div>
-  <div><button class="btn btn-dark" type="submit">Request a Call Back</button></div>
-  <p class="form-msg" role="status">Thanks — we'll call you back shortly.</p>
-</form>'''
-
-def partner_form(pre):
-    return f'''<form class="form" data-enquiry data-subject="Distributor application — ChaarGold website">
-  <div class="row">{field('Full Name', pre + 'name', req=True)}{field('Company Name', pre + 'company')}</div>
-  <div class="row">{field('Country / State', pre + 'region')}{field('Phone Number', pre + 'phone', 'tel', True)}</div>
-  {field('Email Address', pre + 'email', 'email')}
-  <div class="field"><label for="{pre}msg">Tell us about your interest</label><textarea id="{pre}msg" name="message" data-label="Interest"></textarea></div>
-  <div><button class="btn btn-gold" type="submit">Submit application {icon('arrow')}</button></div>
-  <p class="form-msg" role="status">Thank you — we'll be in touch about the partnership.</p>
-</form>'''
+def email_box(title, text, subject, lines, label='Email us'):
+    return (f'<div class="form-box email-box"><span class="ico">{icon("mail")}</span><h3>{title}</h3><p>{text}</p>'
+            f'<div class="btn-row"><a class="btn btn-gold" href="{mail(subject, lines)}">{label} {icon("arrow")}</a>'
+            f'<a class="btn btn-line" href="tel:+{PHONE_RAW}">{icon("phone")} {PHONE}</a></div>'
+            f'<p class="note">Or write to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p></div>')
 
 def enquiry_section(product='', noun='charcoal'):
     base = '../'
@@ -234,7 +206,7 @@ def enquiry_section(product='', noun='charcoal'):
     <div class="split top">
       <div><h3>Request a Quote</h3><p>Please select all products you are interested in purchasing or learning more about. Our team will review your requirements and get back to you with a customised quotation.</p>
       <p>Whether you are looking for a one-time purchase, regular supply, or customised solutions, ChaarGold is here to help. Share your requirements with us, and we’ll work with you to find the right solution.</p></div>
-      <div class="form-box">{quote_form('q-', product)}</div>
+      {email_box('Request a quote by email', 'Click below and your email app opens with a short template — just fill in your details and send.', 'Quote request — ' + (product or 'ChaarGold products'), ['Products of interest: ' + (product or ''), 'Quantity / capacity:', 'Name:', 'Company:', 'Phone:', 'Country:', 'Tell us about your requirement:'], 'Email your requirement')}
     </div>
   </div>
   <div class="tabpanel" role="tabpanel" id="team" aria-labelledby="t-team" hidden>
@@ -244,7 +216,7 @@ def enquiry_section(product='', noun='charcoal'):
           <div class="contact-card"><span class="ico">{icon('whatsapp')}</span><div><h3>Call / WhatsApp</h3><a href="tel:+{PHONE_RAW}">{PHONE}</a></div></div>
           <div class="contact-card"><span class="ico">{icon('mail')}</span><div><h3>Email</h3><a href="mailto:{EMAIL}">{EMAIL}</a></div></div>
         </div></div>
-      <div class="form-box"><h3>Request a Call Back</h3><p>Whether you’re looking for premium charcoal briquettes, premium biochar, or setting up your own Charcoal Pyrolysis Kilns Plant, our team is ready to assist.</p>{callback_form('c-')}</div>
+      {email_box('Request a call back', 'Whether you’re looking for premium charcoal briquettes, premium biochar, or setting up your own Charcoal Pyrolysis Kilns Plant, our team is ready to assist. Email us your name and number and we’ll call you.', 'Call back request', ['Name:', 'Contact number:', 'Best time to call:'], 'Request a call back')}
     </div>
   </div>
   <div class="tabpanel" role="tabpanel" id="partner" aria-labelledby="t-partner" hidden>
@@ -255,7 +227,7 @@ def enquiry_section(product='', noun='charcoal'):
         <h4>Partner benefits</h4>
         {checks(['Exclusive regional opportunities','Competitive pricing and attractive margins','Consistent product quality','Reliable bulk supply capabilities','Marketing and branding support','Export-ready products and packaging','Long-term growth partnerships','Dedicated account and technical support'])}
         <p style="margin-top:1.2rem">Partner with CHAARGOLD to deliver premium charcoal solutions backed by quality, reliability, and performance.</p></div>
-      <div class="form-box"><h3>Distributor Application Form</h3>{partner_form('p-')}</div>
+      {email_box('Apply to become a distributor', 'Tell us about your business and the region you serve. Our team will respond with partnership details.', 'Distribution partner enquiry', ['Full name:', 'Company:', 'Country / State:', 'Phone:', 'Tell us about your interest:'], 'Email your application')}
     </div>
   </div>
 </div></section>'''
@@ -676,7 +648,7 @@ def blog():
 # ------------------------------------------------------------------ contact
 def contact():
     types = ['Charcoal Briquettes', 'Biochar', 'Pyrolysis & Retort Systems', 'Turnkey Carbon Projects', 'Bulk Orders', 'Business Partnerships', 'Other']
-    opts = ''.join('<option>%s</option>' % esc(t) for t in types)
+    enq = ''.join('<a class="btn btn-line" href="%s">%s</a>' % (mail('Enquiry — ' + t, ['Full name:', 'Company:', 'Email:', 'Phone:', 'Country:', 'Message:']), esc(t)) for t in types)
     body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'Contact Us')], '')}<span class="eyebrow">Contact us</span><h1>Let’s build better carbon solutions together</h1>
 <p class="lead" style="max-width:780px">At CHAARGOLD, we believe in creating value through quality charcoal products, innovative carbon technologies and sustainable solutions. Whether you are looking for premium charcoal briquettes, biochar, pyrolysis and retort kilns/systems, or turnkey solutions for carbon projects, our team is ready to assist.</p></div></section>
 <section class="section"><div class="wrap split top">
@@ -687,15 +659,9 @@ def contact():
 <div class="contact-card"><span class="ico">{icon('pin')}</span><div><h3>Our locations</h3><p><b style="color:var(--ink)">Head office</b><br>Bengaluru, Karnataka, India</p><p style="margin:0"><b style="color:var(--ink)">Manufacturing facility</b><br>Penukonda, Andhra Pradesh, India</p></div></div>
 <div class="contact-card"><span class="ico">{icon('instagram')}</span><div><h3>Connect with us</h3><p>Follow CHAARGOLD on social media to stay updated on our products, manufacturing activities, latest developments and carbon solutions.</p><p style="margin:0"><a href="{INSTAGRAM}">Instagram</a> &nbsp; <a href="{FACEBOOK}">Facebook</a></p></div></div>
 </div></div>
-<div class="reveal form-box" id="enquiry"><h3>Send us an enquiry</h3><p>Have a specific requirement or project in mind? Share your details with us, and our team will get in touch to understand your needs and discuss the next steps.</p>
-<form class="form" data-enquiry data-subject="Enquiry — ChaarGold website">
-<div class="row">{field('Full Name', 'e-name', req=True)}{field('Company Name', 'e-company')}</div>
-<div class="row">{field('Email Address', 'e-email', 'email', True)}{field('Phone Number', 'e-phone', 'tel')}</div>
-<div class="row">{field('Country', 'e-country')}<div class="field"><label for="e-type">Enquiry Type</label><select id="e-type" name="type" data-label="Enquiry type">{opts}</select></div></div>
-<div class="field"><label for="e-msg">Message</label><textarea id="e-msg" name="message" data-label="Message"></textarea></div>
-<div><button class="btn btn-gold" type="submit">Submit Enquiry {icon('arrow')}</button></div>
-<p class="form-msg" role="status">Thank you — your email app should have opened with your enquiry. If it didn't, write to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p></form>
-<p class="note">We value your interest in CHAARGOLD and look forward to exploring how we can support your business.</p></div></div></section>'''
+<div class="reveal form-box email-box" id="enquiry"><span class="ico">{icon('mail')}</span><h3>Send us an enquiry</h3><p>Have a specific requirement or project in mind? Choose a topic and your email app opens with a short template. Share your details and our team will get in touch to understand your needs and discuss the next steps.</p>
+<div class="enq-types">{enq}</div>
+<p class="note">We value your interest in CHAARGOLD and look forward to exploring how we can support your business. Or write directly to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p></div></div></section>'''
     write('contact.html', 'Contact Us', 'Contact ChaarGold for quotations, bulk orders, biochar, pyrolysis kilns and partnerships. Bengaluru head office; Penukonda manufacturing facility.', body, '0.8')
 
 # ------------------------------------------------------------------ faq
