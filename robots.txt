@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://chaargold.com/sitemap.xml
