@@ -19,7 +19,7 @@
     });
   });
   document.addEventListener('click', function (e) {
-    $$('.dd.open').forEach(function (d) { if (!d.contains(e.target) && window.innerWidth > 1040) d.classList.remove('open'); });
+    $$('.dd.open').forEach(function (d) { if (!d.contains(e.target) && window.innerWidth > 1180) d.classList.remove('open'); });
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { $$('.dd.open').forEach(function (d) { d.classList.remove('open'); }); var lb = $('.lightbox.open'); if (lb) lb.classList.remove('open'); }
@@ -71,4 +71,23 @@
   $$('.gimg').forEach(function (b) { b.addEventListener('click', function () { $('img', lb).src = b.getAttribute('data-full'); $('img', lb).alt = $('img', b).alt; lb.classList.add('open'); }); });
   if (lb) lb.addEventListener('click', function () { lb.classList.remove('open'); });
 
+  // Contact-page enquiry form: posts JSON to the endpoint on the form (data-endpoint) and reports the result in place.
+  $$('form[data-enquiry]').forEach(function (f) {
+    var ok = $('.form-msg.ok', f), err = $('.form-msg.err', f), btn = $('button[type="submit"]', f);
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!f.checkValidity()) { f.reportValidity(); return; }
+      var data = {};
+      $$('input,textarea', f).forEach(function (el) { if (el.name) data[el.name] = el.value.trim(); });
+      data._subject = f.getAttribute('data-subject') || 'Website enquiry';
+      data._template = 'table';
+      ok.hidden = true; err.hidden = true;
+      var label = btn.textContent; btn.disabled = true; btn.textContent = 'Sending…';
+      fetch(f.getAttribute('data-endpoint'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(data) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || j.success === 'false' || j.success === false) throw new Error('send failed'); }); })
+        .then(function () { f.reset(); ok.hidden = false; })
+        .catch(function () { err.hidden = false; })
+        .then(function () { btn.disabled = false; btn.textContent = label; });
+    });
+  });
 })();
