@@ -10,8 +10,8 @@ EMAIL = 'contact@chaargold.com'
 FORM_ENDPOINT = 'https://formsubmit.co/ajax/contact@chaargold.com'   # contact-page enquiry form posts here (JSON)
 PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
-INSTAGRAM = '#'   # TODO: paste Instagram profile URL
-FACEBOOK = '#'    # TODO: paste Facebook page URL
+INSTAGRAM = 'https://www.instagram.com/chaargold'
+FACEBOOK = 'https://www.facebook.com/profile.php?id=61596008200433'
 VER = '4'
 
 def esc(s): return html.escape(s, quote=False)
@@ -148,7 +148,7 @@ def layout(path, title, desc, body, og_img='logo-chaargold', schema=''):
   <div class="f-grid">
     <div class="f-brand"><a class="brand" href="{base}index.html" aria-label="CHAARGOLD home"><img src="{base}assets/img/logo-icon.webp" alt="" width="46" height="68" loading="lazy"><span class="brand-text"><b>CHAARGOLD</b><small>Crafting Carbon Perfection</small></span></a>
       <p>Turning biomass into black gold. Charcoal briquettes, biochar, wood vinegar and turnkey pyrolysis solutions — engineered in India.</p>
-      <div class="social"><a href="{INSTAGRAM}" aria-label="Instagram">{icon('instagram')}</a><a href="{FACEBOOK}" aria-label="Facebook">{icon('facebook')}</a><a href="https://wa.me/{PHONE_RAW}" aria-label="WhatsApp">{icon('whatsapp')}</a></div></div>
+      <div class="social"><a href="{INSTAGRAM}" aria-label="ChaarGold on Instagram" target="_blank" rel="noopener">{icon('instagram')}</a><a href="{FACEBOOK}" aria-label="ChaarGold on Facebook" target="_blank" rel="noopener">{icon('facebook')}</a><a href="https://wa.me/{PHONE_RAW}" aria-label="WhatsApp" target="_blank" rel="noopener">{icon('whatsapp')}</a></div></div>
     <div><h4>Company</h4><ul><li><a href="{base}index.html">Home</a></li><li><a href="{base}about.html">About Us</a></li><li><a href="{base}biochaargold.html">BIOCHAARGOLD™</a></li><li><a href="{base}sustainability.html">Sustainability</a></li><li><a href="{base}gallery.html">Gallery</a></li><li><a href="{base}blog.html">Blog</a></li><li><a href="{base}contact.html">Contact Us</a></li></ul></div>
     <div><h4>Products</h4><ul>{foot_products}</ul></div>
     <div><h4>Get in touch</h4><ul>
@@ -672,7 +672,7 @@ def contact():
 <div class="contact-card"><span class="ico">{icon('mail')}</span><div><h3>Email us</h3><p>For product enquiries, quotations, bulk orders and business partnerships, reach out to our team by email.</p><a href="mailto:{EMAIL}">{EMAIL}</a></div></div>
 <div class="contact-card"><span class="ico">{icon('phone')}</span><div><h3>Call us</h3><p>Have questions about our products or services? Connect with our team for information and assistance.</p><a href="tel:+{PHONE_RAW}">{PHONE}</a></div></div>
 <div class="contact-card"><span class="ico">{icon('pin')}</span><div><h3>Our locations</h3><p><b style="color:var(--ink)">Head office</b><br>Bengaluru, Karnataka, India</p><p style="margin:0"><b style="color:var(--ink)">Manufacturing facility</b><br>Penukonda, Andhra Pradesh, India</p></div></div>
-<div class="contact-card"><span class="ico">{icon('instagram')}</span><div><h3>Connect with us</h3><p>Follow CHAARGOLD on social media to stay updated on our products, manufacturing activities, latest developments and carbon solutions.</p><p style="margin:0"><a href="{INSTAGRAM}">Instagram</a> &nbsp; <a href="{FACEBOOK}">Facebook</a></p></div></div>
+<div class="contact-card"><span class="ico">{icon('instagram')}</span><div><h3>Connect with us</h3><p>Follow CHAARGOLD on social media to stay updated on our products, manufacturing activities, latest developments and carbon solutions.</p><p style="margin:0"><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a> &nbsp; <a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></p></div></div>
 </div></div>
 <div class="reveal form-box" id="enquiry"><h3>Send us an enquiry</h3><p>Have a specific requirement or project in mind? Leave your details and message below — our team will get in touch to understand your needs and discuss the next steps.</p>
 <form class="form" id="enquiry-form" data-enquiry data-endpoint="{FORM_ENDPOINT}" data-subject="New enquiry from the ChaarGold website">
