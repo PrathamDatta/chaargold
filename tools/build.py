@@ -12,7 +12,7 @@ PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
 INSTAGRAM = 'https://www.instagram.com/chaargold'
 FACEBOOK = 'https://www.facebook.com/profile.php?id=61596008200433'
-VER = '4'
+VER = '6'
 
 def esc(s): return html.escape(s, quote=False)
 def load(n): return json.load(open(os.path.join(ROOT, 'data', n), encoding='utf-8'))
@@ -79,8 +79,8 @@ PRODUCTS = [
 P = {p['slug']: p for p in PRODUCTS}
 
 NAV = [('index.html', 'Home'), ('about.html', 'About Us'), ('products/index.html', 'Products'),
-       ('biochaargold.html', 'BIOCHAARGOLD™'), ('gallery.html', 'Gallery'), ('sustainability.html', 'Sustainability'),
-       ('blog.html', 'Blog'), ('contact.html', 'Contact Us')]
+       ('biochaargold.html', 'BIOCHAARGOLD™'), ('applications.html', 'Applications'), ('gallery.html', 'Gallery'), ('sustainability.html', 'Sustainability'),
+       ('blog.html', 'Blog'), ('shop.html', 'Shop Online'), ('contact.html', 'Contact Us')]
 
 def plink(p, base):
     return base + (p.get('href') or 'products/%s.html' % p['slug'])
@@ -95,7 +95,7 @@ def fix_terms(h):
 PAGES = []   # (path, priority)
 
 # ------------------------------------------------------------------ layout
-def layout(path, title, desc, body, og_img='logo-chaargold', schema=''):
+def layout(path, title, desc, body, og_img='logo-chaargold', schema='', bodycls=''):
     base = '../' if '/' in path else ''
     cur = path
     def cls(p):
@@ -130,8 +130,9 @@ def layout(path, title, desc, body, og_img='logo-chaargold', schema=''):
 <link rel="stylesheet" href="{base}assets/css/style.css?v={VER}">
 {schema}
 </head>
-<body>
+<body{' class="%s"' % bodycls if bodycls else ''}>
 <a class="skip" href="#main">Skip to content</a>
+<div class="site-top">
 <div class="topbar"><div class="wrap">
   <div class="tb-left"><a href="mailto:{EMAIL}">{EMAIL}</a><a href="tel:+{PHONE_RAW}">{PHONE}</a></div>
   <div class="tb-right">We ship all over India</div>
@@ -141,6 +142,7 @@ def layout(path, title, desc, body, og_img='logo-chaargold', schema=''):
   <button class="burger" aria-label="Menu" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
   <nav class="nav" id="nav" aria-label="Main">{nav}<span class="nav-cta"><a class="btn btn-dark" href="{base}contact.html#enquiry">Get a Quote</a></span></nav>
 </div></header>
+</div>
 <main id="main">
 {body}
 </main>
@@ -149,14 +151,14 @@ def layout(path, title, desc, body, og_img='logo-chaargold', schema=''):
     <div class="f-brand"><a class="brand" href="{base}index.html" aria-label="CHAARGOLD home"><img src="{base}assets/img/logo-icon.webp" alt="" width="46" height="68" loading="lazy"><span class="brand-text"><b>CHAARGOLD</b><small>Crafting Carbon Perfection</small></span></a>
       <p>Turning biomass into black gold. Charcoal briquettes, biochar, wood vinegar and turnkey pyrolysis solutions — engineered in India.</p>
       <div class="social"><a href="{INSTAGRAM}" aria-label="ChaarGold on Instagram" target="_blank" rel="noopener">{icon('instagram')}</a><a href="{FACEBOOK}" aria-label="ChaarGold on Facebook" target="_blank" rel="noopener">{icon('facebook')}</a><a href="https://wa.me/{PHONE_RAW}" aria-label="WhatsApp" target="_blank" rel="noopener">{icon('whatsapp')}</a></div></div>
-    <div><h4>Company</h4><ul><li><a href="{base}index.html">Home</a></li><li><a href="{base}about.html">About Us</a></li><li><a href="{base}biochaargold.html">BIOCHAARGOLD™</a></li><li><a href="{base}sustainability.html">Sustainability</a></li><li><a href="{base}gallery.html">Gallery</a></li><li><a href="{base}blog.html">Blog</a></li><li><a href="{base}contact.html">Contact Us</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="{base}index.html">Home</a></li><li><a href="{base}about.html">About Us</a></li><li><a href="{base}biochaargold.html">BIOCHAARGOLD™</a></li><li><a href="{base}applications.html">Applications</a></li><li><a href="{base}sustainability.html">Sustainability</a></li><li><a href="{base}gallery.html">Gallery</a></li><li><a href="{base}blog.html">Blog</a></li><li><a href="{base}shop.html">Shop Online</a></li><li><a href="{base}contact.html">Contact Us</a></li></ul></div>
     <div><h4>Products</h4><ul>{foot_products}</ul></div>
     <div><h4>Get in touch</h4><ul>
       <li><a href="mailto:{EMAIL}">{EMAIL}</a></li><li><a href="tel:+{PHONE_RAW}">{PHONE}</a></li>
       <li>Head office: Bengaluru, Karnataka</li><li>Plant: Penukonda, Andhra Pradesh</li>
       <li><a href="{base}faq.html">FAQ</a> · <a href="{base}terms.html">Terms</a></li></ul></div>
   </div>
-  <div class="f-bottom"><span>© 2026 CHAARGOLD. All rights reserved.</span><span>Crafting Carbon Perfection.</span></div>
+  <div class="f-bottom"><span>© 2026 CHAARGOLD. All rights reserved.</span></div>
 </div></footer>
 <a class="wa-float" href="https://wa.me/{PHONE_RAW}?text=Hello%20ChaarGold%2C%20I%27d%20like%20to%20know%20more." target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">{icon('whatsapp')}<span>Chat with us</span></a>
 <script src="{base}assets/js/main.js?v={VER}" defer></script>
@@ -268,7 +270,7 @@ def stats_row():
 
 # ------------------------------------------------------------------ product pages
 def product_page(slug, eyebrow, lead, intro, features, apps, extra_after='', extra_before='', brochure=None, noun='charcoal',
-                 title=None, desc='', img_mode='', img_name=None, hero_extra='', spec_note=True, lead_first=True, wide=False):
+                 title=None, desc='', img_mode='', img_name=None, hero_extra='', spec_note=True, lead_first=True, wide=False, intro_raw=''):
     p = P[slug]; base = '../'
     title = title or p['name']
     media = img(img_name or p['img'], p['name'], base, lazy=False)
@@ -284,7 +286,7 @@ def product_page(slug, eyebrow, lead, intro, features, apps, extra_after='', ext
         feat_html = f'<div class="split top"><div>{head("Why it performs", "Key features")}{checks(features)}</div><div>{head("Where it’s used", "Applications")}{app_html}<p class="note">Specifications can be customized based on customer requirements and intended applications.</p></div></div>'
     elif app_html:
         feat_html = app_html
-    intro_html = ''.join('<p%s>%s</p>' % (' class="lead"' if (i == 0 and lead_first) else '', esc(t)) for i, t in enumerate(intro))
+    intro_html = intro_raw or ''.join('<p%s>%s</p>' % (' class="lead"' if (i == 0 and lead_first) else '', esc(t)) for i, t in enumerate(intro))
     body = f'''
 <section class="page-hero"><div class="wrap">{crumbs([('products/index.html', 'Products'), (None, p['name'])], base)}
 <div class="ph-grid"><div><span class="eyebrow">{eyebrow}</span><h1>{esc(title)}</h1><p class="lead">{lead}</p>
@@ -413,10 +415,22 @@ def build_products():
             ('More Versatility, More Menu Options', 'Cooking, grilling and tandoor-style preparation can serve different menu requirements, subject to stove compatibility and the appropriate accessories.'),
             ('An Alternative Energy Choice', 'GoldFlame gives kitchens and food businesses another fuel option to consider as part of a broader approach to energy resilience and responsible biomass utilisation.')]
     prac_h = ''.join(f'<li><b style="color:var(--ink)">{t}.</b> {d}</li>' for t, d in prac)
+    gf_ben = [('Sustained Heat Performance', 'Enjoy extended cooking with fewer fuel replacements, depending on briquette and stove performance.'),
+              ('Efficient Fuel Utilisation', 'Make effective use of the heat generated by charcoal briquettes.'),
+              ('Versatile Cooking Applications', 'Ideal for grilling, roasting, boiling, simmering and everyday cooking.'),
+              ('Reduces reliance on LPG and other fuels', 'Variations in availability of LPG will not impact your cooking'),
+              ('Distinctive Smoky Flavour', 'Adds a traditional charcoal-grilled flavour to food.'),
+              ('Convenient Fuel Handling', 'Uniform briquettes are easy to load, store and handle.'),
+              ('Outdoor Cooking Convenience', 'A practical choice for outdoor kitchens, food stalls and recreational cooking.'),
+              ('Cost Affordability & Efficiency', 'Offers an opportunity to optimise cooking fuel costs through efficient stove and fuel use.')]
+    gf_intro = ('<h2 style="text-align:center">Benefits of Charcoal Briquette Stoves &amp; Cooking</h2>'
+                '<p class="lead" style="text-align:center">Charcoal briquette stoves offer a practical and versatile cooking solution, combining the sustained heat of charcoal briquettes with the convenience of a purpose-built stove.</p>'
+                '<h3 style="margin-top:1.6em">Key Benefits</h3><ul class="checks cols">' + ''.join('<li><b style="color:var(--ink)">%s</b> – %s</li>' % (esc(t), esc(d)) for t, d in gf_ben) + '</ul>'
+                '<p class="center" style="margin-top:1.6rem"><b style="color:var(--ink)">Powerful heat. Versatile cooking. Practical performance.</b></p>')
     product_page('goldflame-stoves', 'GoldFlame · Signature stoves',
         'A practical approach to affordable cooking, flexible fuel choices and a more sustainable cooking future.',
         ['GoldFlame by ChaarGold offers a practical alternative to conventional cooking fuels through charcoal briquette stoves designed for everyday cooking needs. From households and outdoor cooking to food businesses and commercial kitchens, GoldFlame brings together fuel flexibility, functionality and a forward-looking approach to cooking.'],
-        None, None, noun='charcoal briquette stove', title='GoldFlame Charcoal Briquette Stoves', img_name='goldflame-light',
+        None, None, noun='charcoal briquette stove', title='GoldFlame Charcoal Briquette Stoves', img_name='goldflame-light', intro_raw=gf_intro, wide=True,
         extra_before=f'''<section class="section bg-ink"><div class="wrap">{head('A cooking revolution','Fueled by smarter choices','Discover GoldFlame charcoal briquette stoves — a practical approach to affordable cooking, flexible fuel choices and a more sustainable cooking future.')}<div class="btn-row" style="margin:0">{pills}</div></div></section>
 <section class="section"><div class="wrap split top"><div class="reveal"><span class="eyebrow">02 — Two briquettes</span><h2>One smart combination.</h2><p class="lead">Discover how GoldFlame can combine different briquette shapes for starting and sustaining the fire.</p>
 <div class="grid g2" style="margin-top:28px"><div class="card flat"><div style="aspect-ratio:1;display:grid;place-items:center;margin-bottom:12px">{img('honeycomb-briquettes', 'Honeycomb briquettes', '../')}</div><span class="eyebrow plain">Step 1 · Start</span><h3>Honeycomb Briquettes</h3><p>Honeycomb briquettes can be used to help establish the initial fire, following the stove’s recommended lighting method. Their distinctive perforated design allows air to pass through the briquette.</p></div>
@@ -503,18 +517,19 @@ def home():
 {head('Our portfolio', 'Engineering sustainable carbon solutions', 'At CHAARGOLD, we believe that today’s biomass waste is tomorrow’s sustainable resource. Through advanced pyrolysis technology and innovative manufacturing processes, we convert agricultural and forestry biomass into premium carbon products that create value for farmers, industries, and the environment.')}
 <div class="grid g4">{cards}</div></div></section>
 <section class="section"><div class="wrap split">
-<div class="reveal imgcard" style="max-width:520px;margin-inline:auto">{img('waste-to-value', 'Infographic: from waste to value — biomass to charcoal, biochar and wood vinegar', '')}</div>
+<div class="reveal imgcard zoomable" style="max-width:640px;margin-inline:auto"><button class="gimg" type="button" data-full="assets/img/waste-to-value.webp" aria-label="Click to enlarge the From Waste to Value infographic">{img('waste-to-value', 'Infographic: from waste to value — biomass to charcoal, biochar and wood vinegar', '')}<span class="zoom-hint">Click to enlarge</span></button></div>
 <div class="reveal"><span class="eyebrow">Circular carbon</span><h2>From waste to value</h2>
-<p class="lead">Our diverse portfolio includes biochar, lump charcoal, hexagonal briquettes, pillow briquettes, honeycomb briquettes, wood vinegar, smoke oil, and other carbon-rich by-products designed to meet global quality standards.</p>
+<p class="lead">Our diverse portfolio includes biochar, lump charcoal, hexagonal briquettes, pillow briquettes, honeycomb briquettes, wood vinegar, coal tar, and other carbon-rich by-products designed to meet global quality standards.</p>
 <p>Whether supporting regenerative agriculture, industrial heating applications, renewable energy initiatives, or carbon sequestration projects, CHAARGOLD is committed to delivering reliable, sustainable, and performance-driven solutions.</p>
 <a class="btn btn-dark" href="sustainability.html">Our sustainability commitment {icon('arrow')}</a></div></div></section>
 <section class="section bg-cream brand-green"><div class="wrap split">
 <div class="reveal"><img src="assets/img/logo-biochaargold.webp" alt="BIOCHAARGOLD — Accelerating Carbon Cultivation" class="hero-logo" loading="lazy" width="220" height="220"><span class="eyebrow">Our biochar brand</span><h2>Healing the Earth. Sequestering carbon.</h2><p class="lead">Bio-ChaarGold biochar is engineered and tested for agriculture, environmental management and carbon sequestration — locking carbon in stable form for centuries.</p><div class="btn-row"><a class="btn btn-dark" href="biochaargold.html">Explore BIOCHAARGOLD™ {icon('arrow')}</a></div></div>
 <div class="reveal imgcard">{img('biochar-bag', 'BIOCHAARGOLD premium biochar bag with spilled biochar', '')}</div></div></section>
 <section class="section bg-ink"><div class="wrap">{head('Our footprint so far', 'Numbers we’re proud of', '', True)}{stats_row()}</div></section>
+<div class="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged image"><button type="button" aria-label="Close">×</button><img alt=""></div>
 {cta_band('Start your ChaarGold journey today', 'Whether you need 1 FCL of briquettes or a complete pyrolysis plant installation — we have the products, the expertise, and the commitment.', '')}
 '''
-    write('index.html', 'ChaarGold — Turning Biomass Into Black Gold', 'ChaarGold manufactures charcoal briquettes, lump charcoal, biochar and wood vinegar, and builds turnkey pyrolysis kilns and plants. Based in Bengaluru, made in Andhra Pradesh.', body, '1.0', schema=schema)
+    write('index.html', 'ChaarGold — Turning Biomass Into Black Gold', 'ChaarGold manufactures charcoal briquettes, lump charcoal, biochar and wood vinegar, and builds turnkey pyrolysis kilns and plants. Based in Bengaluru, made in Andhra Pradesh.', body, '1.0', schema=schema, bodycls='home')
 
 # ------------------------------------------------------------------ about
 def about():
@@ -535,9 +550,9 @@ def about():
     vals = [('bulb', 'Innovation', 'We create smarter, better and sustainable solutions.'), ('award', 'Excellence', 'We deliver the highest standards in quality and performance.'),
             ('leaf', 'Sustainability', 'We protect nature by turning waste into value.'), ('users', 'Customer Partnership', 'We succeed when our customers succeed. Their goals drive our innovation and commitment.')]
     vh = ''.join(f'<div class="val"><b>{t}</b>{d}</div>' for _, t, d in vals)
-    body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'About Us')], '')}<div class="ph-grid"><div><span class="eyebrow">About us</span><h1>Who we are</h1>
+    body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'About Us')], '')}<div class="ph-grid wideimg"><div><span class="eyebrow">About us</span><h1>Who we are</h1>
 <p class="lead">ChaarGold is a vertically integrated manufacturing company specializing in the production and supply of charcoal briquettes, biochar, wood vinegar, smoke oil and related carbon-based products. We also offer turnkey pyrolysis plant solutions, providing end-to-end support from project planning and engineering design to equipment manufacturing, installation, commissioning, and operational training.</p></div>
-<div class="ph-media reveal">{img('carbon-products', 'ChaarGold products: lump charcoal, charcoal briquettes, biochar, wood vinegar, pyrolysis kilns, briquette stoves and other offerings', '', lazy=False)}</div></div></div></section>
+<div class="ph-media big reveal">{img('carbon-products', 'ChaarGold products: lump charcoal, charcoal briquettes, biochar, wood vinegar, pyrolysis kilns, briquette stoves and other offerings', '', lazy=False)}</div></div></div></section>
 <section class="section"><div class="wrap split top"><div class="reveal"><p>Our company was built on a simple but powerful idea: that the ancient art of charcoal making could be elevated by modern science, engineering rigor, and a deep commitment to sustainability. Today, ChaarGold stands as one of the most trusted names in carbon manufacturing, serving clients across hospitality, agriculture, textile, energy, chemical, and environmental sectors.</p>
 <p>Headquartered in Bengaluru, Karnataka with an expertly engineered 5-acre manufacturing facility in Penukonda, Andhra Pradesh, we operate several production lines and a dedicated R&amp;D division — all under one roof, all to one standard of excellence.</p></div>
 <div class="reveal card flat" style="background:var(--cream)"><span class="eyebrow">A family-run business</span><p>At ChaarGold, we are a family-run business built on unity, passion and a shared vision for a sustainable future. We believe in the strength of teamwork, the value of diverse perspectives, and the importance of balancing family values with professional excellence.</p><p style="margin:0">Our approach combines personal commitment with a strong sense of responsibility, driving us to build lasting partnerships, deliver dependable solutions, and grow with integrity. Together, we are committed to advancing sustainable biomass solutions through innovation, collaboration and purpose.</p></div></div></section>
@@ -607,7 +622,7 @@ def sustainability():
     blog = load('blog.json')
     pyro = ['Maximize biomass utilization', 'Reduce smoke emissions', 'Recover valuable by-products', 'Improve fuel efficiency', 'Minimize environmental impact', 'Increase production consistency']
     mfg = ['Efficient resource utilization', 'Reduced waste generation', 'Biomass valorization', 'Continuous process improvement', 'Worker safety and training', 'Responsible sourcing practices']
-    body = f'''<section class="page-hero brand-green" style="padding-bottom:0"><div class="wrap">{crumbs([(None, 'Sustainability')], '')}<span class="eyebrow">Sustainability at ChaarGold</span><h1 style="max-width:900px">Sustainability is not a tagline — it is the foundation of every decision we make.</h1></div>
+    body = f'''<section class="page-hero brand-green" style="padding-bottom:0"><div class="wrap">{crumbs([(None, 'Sustainability')], '')}<span class="eyebrow">Sustainability at ChaarGold</span><h1 style="max-width:900px">Sustainability is not a tagline —<br> it is the foundation of every decision we make.</h1></div>
 <div class="wrap" style="margin-top:36px"><div class="banner" style="border-radius:24px 24px 0 0">{img('sustainability-banner', 'Sustainability at ChaarGold — a hand holding a seedling in soil against green hills', '', lazy=False)}</div></div></section>
 <section class="section"><div class="wrap split"><div class="reveal brand-green"><span class="eyebrow">Building a circular carbon economy</span><h2>Waste becomes a resource</h2></div>
 <div class="reveal"><p class="lead">At ChaarGold, sustainability is not a department — it is the foundation of everything we do. Our mission is to transform agricultural and biomass residues into high-value carbon products that create economic, environmental, and social impact.</p>
@@ -626,6 +641,42 @@ def sustainability():
 <div class="reveal"><h3>Our vision for the future</h3><p>We envision a future where biomass waste is no longer discarded, where carbon is returned to the soil, and where sustainable carbon products drive environmental restoration and economic growth.</p><p>Through innovation, engineering excellence, and a commitment to responsible manufacturing, ChaarGold is working to build a cleaner, greener, and more sustainable world.</p><p class="gold" style="font:italic 600 1.5rem var(--font-display)">Crafting Carbon Perfection. Creating a Sustainable Future.</p></div></div></section>
 {cta_band('Build a lower-carbon future with us', 'Talk to our team about biochar, carbon projects and sustainable fuels.', '')}'''
     write('sustainability.html', 'Sustainability', 'How ChaarGold turns biomass waste into premium carbon products, sequesters carbon with biochar and supports regenerative agriculture.', body, '0.8', og_img='sustainability-banner')
+
+# ------------------------------------------------------------------ applications
+def applications():
+    apps = [
+     ('app-agriculture', 'Agriculture & Horticulture', 'Biochar can be incorporated into soil-management and growing-media programmes to support soil structure, water retention and nutrient management. Wood vinegar is also being explored for plant-care and crop-management applications, subject to appropriate dilution, testing and crop suitability.', ['Biochar', 'Wood Vinegar', 'Pyrolysis Kilns'], 'Biochar being sprinkled around a young tomato seedling'),
+     ('app-poultry', 'Poultry & Livestock', 'Charcoal briquettes can serve as a fuel source in suitable poultry and livestock heating systems. Consistent, properly managed heat is particularly important during chick brooding, helping maintain the required temperature and reduce cold stress.', ['Charcoal', 'Charcoal Briquettes'], 'Chicks in a poultry shed with brooder heating'),
+     ('app-hospitality', 'Hospitality, Restaurants & Catering', 'Charcoal and briquettes are widely used in commercial kitchens, restaurants, hotels and catering establishments for grilling, barbecuing and other cooking applications. Suitable briquette formats provide a practical solid-fuel option for food-service operations.', ['Charcoal', 'Charcoal Briquettes', 'Honeycomb Briquettes'], 'A chef grilling kebabs over glowing charcoal in a commercial kitchen'),
+     ('app-industrial', 'Industrial Heating & Process Energy', 'Solid charcoal and briquettes can be used as fuel in compatible industrial heating systems, including selected boilers, furnaces, kilns and thermal-processing equipment. Their suitability depends on fuel specifications, equipment design and operating requirements.', ['Charcoal', 'Briquettes', 'Pyrolysis Kilns'], 'A worker feeding charcoal briquettes into an industrial furnace'),
+     ('app-textile', 'Textile, Apparel & Functional Fabrics', 'Carbon derived from charcoal can be processed into fine particles and incorporated into textile materials through specialised coating, printing or fibre-blending techniques. This creates opportunities for developing functional fabrics with properties such as odour adsorption, moisture management and electrical conductivity. Potential applications include sportswear, footwear, upholstery, home textiles and specialised technical fabrics.', ['Charcoal', 'Biochar', 'Activated Carbon'], 'Black yarn cones and fabrics beside carbon powder and charcoal'),
+     ('app-food', 'Food & Agro-Processing', 'Food and agricultural processing facilities require heat for drying, baking, roasting and other production activities. Briquettes can provide thermal energy in compatible ovens, dryers and boiler systems, making them relevant to a range of processing operations.', ['Charcoal', 'Briquettes'], 'Charcoal briquettes beside a bakery oven in a food-processing facility'),
+     ('app-ceramics', 'Ceramics, Bricks & Building Materials', 'Ceramic, brick and tile manufacturing require controlled high-temperature processing. Suitable charcoal and briquette fuels can be evaluated for compatible kilns and furnaces, depending on the required heat profile and product specifications.', ['Charcoal', 'Briquettes', 'Pyrolysis Kilns'], 'A brick kiln glowing with stacked bricks inside'),
+     ('app-metallurgy', 'Metallurgy & Metal Processing', 'Specified grades of biomass-derived charcoal can be used as a carbon source, reducing agent or process fuel in selected metallurgical applications. Its suitability depends on fixed carbon, ash, moisture, sulphur, phosphorus and reactivity requirements.', ['Industrial Charcoal', 'Charcoal Briquettes'], 'Molten metal being poured next to a pile of charcoal'),
+     ('app-water', 'Water Treatment & Environmental Applications', 'Specially prepared and appropriately tested biochar can be explored as a filtration or adsorption medium in selected water and wastewater treatment applications. Its performance depends on feedstock, production conditions, surface properties and any required activation or modification.', ['Biochar', 'Pyrolysis Kilns'], 'A water-treatment filtration vessel beside a reservoir'),
+     ('app-beauty', 'Activated Carbon, Beauty & Consumer Products', 'Activated carbon is valued for its highly porous structure and adsorption properties, making it a versatile material across beauty, personal care and consumer-product industries. It is used as an ingredient in selected formulations such as facial cleansers, soaps, cleansing masks and other personal-care products. Its applications also extend to odour-control products, refrigerator filters, air-purifying products and specialised filtration components.', ['Charcoal', 'Activated Carbon'], 'Activated carbon beauty products: cleanser, soap, mask and filters'),
+    ]
+    rows = ''
+    for i, (im, t, d, pr, alt) in enumerate(apps, 1):
+        chip = ''.join('<li>%s</li>' % esc(x) for x in pr)
+        rev = ' rev' if i % 2 == 0 else ''
+        rows += f'<article class="app-row reveal{rev}"><div class="app-img">{img(im, alt, "")}</div><div class="app-text"><span class="n">{i:02d}</span><h2>{esc(t)}</h2><p>{esc(d)}</p><div class="app-prod"><span>Products</span><ul class="chips">{chip}</ul></div></div></article>'
+    body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'Applications')], '')}<span class="eyebrow">Applications</span><h1>Applications across industries</h1>
+<p class="lead" style="max-width:780px"><i>One Material. Multiple Industries. Endless Possibilities.</i></p>
+<p style="max-width:780px">At CHAARGOLD, we believe in unlocking the full potential of biomass through advanced carbonisation technology and versatile carbon-based products. From charcoal and briquettes used for thermal applications to biochar and wood vinegar with agricultural and environmental potential, our solutions cater to a diverse range of industries.</p>
+<p style="max-width:780px">Our products and pyrolysis systems support applications across traditional industries and emerging sectors, creating opportunities to convert biomass into valuable resources. Explore how CHAARGOLD’s products and technologies can serve different industrial, commercial and agricultural requirements.</p></div></section>
+<section class="section"><div class="wrap">{rows}
+<p class="lead center reveal" style="max-width:820px;margin:48px auto 0"><b style="color:var(--ink)">Beyond these sectors, there are several other applications and industry partnerships, unlocking the potential of charcoal and its by-products across an expanding range of markets.</b></p></div></section>
+{cta_band('Tell us about your application', 'Share your requirement and our team will recommend the right product and specification.', '')}'''
+    write('applications.html', 'Applications', 'Applications of ChaarGold charcoal, briquettes, biochar, wood vinegar and pyrolysis kilns across agriculture, hospitality, industry, textiles, metallurgy, water treatment and more.', body, '0.8')
+
+# ------------------------------------------------------------------ shop
+def shop():
+    body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'Shop Online')], '')}<span class="eyebrow">Shop online</span><h1>Our online store is coming soon!</h1>
+<p class="lead" style="max-width:720px">In the meantime, please get in touch with our team for product enquiries, bulk orders and business requirements.</p>
+<p class="cta-contact" style="justify-content:flex-start"><a href="mailto:{EMAIL}">{icon('mail')} {EMAIL}</a><a href="tel:+{PHONE_RAW}">{icon('phone')} {PHONE}</a></p>
+<div class="btn-row" style="margin-top:1.4rem"><a class="btn btn-gold" href="contact.html#enquiry">Send us an enquiry</a><a class="btn btn-line" href="products/index.html">Browse products</a></div></div></section>'''
+    write('shop.html', 'Shop Online', 'The ChaarGold online store is coming soon. Contact our team for product enquiries, bulk orders and business requirements.', body, '0.5')
 
 # ------------------------------------------------------------------ gallery
 def gallery():
@@ -664,10 +715,8 @@ def blog():
 
 # ------------------------------------------------------------------ contact
 def contact():
-    body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'Contact Us')], '')}<span class="eyebrow">Contact us</span><h1>Let’s build better carbon solutions together</h1>
-<p class="lead" style="max-width:780px">At CHAARGOLD, we believe in creating value through quality charcoal products, innovative carbon technologies and sustainable solutions. Whether you are looking for premium charcoal briquettes, biochar, pyrolysis and retort kilns/systems, or turnkey solutions for carbon projects, our team is ready to assist.</p></div></section>
-<section class="section"><div class="wrap split top">
-<div class="reveal"><span class="eyebrow">Get in touch</span><h2>We’d love to hear from you</h2><p>Get in touch with us to discuss your requirements, explore our products or enquire about business collaborations. We look forward to working with you.</p>
+    body = f'''<section class="section contact-top"><div class="wrap">{crumbs([(None, 'Contact Us')], '')}<div class="split top">
+<div class="reveal"><span class="eyebrow">Get in touch</span><h1 class="h2like">We’d love to hear from you</h1><p>Get in touch with us to discuss your requirements, explore our products or enquire about business collaborations. We look forward to working with you.</p>
 <div class="grid" style="margin-top:24px">
 <div class="contact-card"><span class="ico">{icon('mail')}</span><div><h3>Email us</h3><p>For product enquiries, quotations, bulk orders and business partnerships, reach out to our team by email.</p><a href="mailto:{EMAIL}">{EMAIL}</a></div></div>
 <div class="contact-card"><span class="ico">{icon('phone')}</span><div><h3>Call us</h3><p>Have questions about our products or services? Connect with our team for information and assistance.</p><a href="tel:+{PHONE_RAW}">{PHONE}</a></div></div>
@@ -683,7 +732,9 @@ def contact():
 <div><button class="btn btn-gold" type="submit">Submit Enquiry {icon('arrow')}</button></div>
 <p class="form-msg ok" role="status" hidden>Thank you — your enquiry has been sent. Our team will get back to you shortly.</p>
 <p class="form-msg err" role="alert" hidden>Sorry, we couldn’t send your message just now. Please call <a href="tel:+{PHONE_RAW}">{PHONE}</a> or write to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p></form>
-<p class="note">We value your interest in CHAARGOLD and look forward to exploring how we can support your business.</p></div></div></section>'''
+<p class="note">We value your interest in CHAARGOLD and look forward to exploring how we can support your business.</p></div></div></div></section>
+<section class="section bg-cream"><div class="wrap"><span class="eyebrow">Contact us</span><h2 style="max-width:820px">Let’s build better carbon solutions together</h2>
+<p class="lead" style="max-width:780px">At CHAARGOLD, we believe in creating value through quality charcoal products, innovative carbon technologies and sustainable solutions. Whether you are looking for premium charcoal briquettes, biochar, pyrolysis and retort kilns/systems, or turnkey solutions for carbon projects, our team is ready to assist.</p></div></section>'''
     write('contact.html', 'Contact Us', 'Contact ChaarGold for quotations, bulk orders, biochar, pyrolysis kilns and partnerships. Bengaluru head office; Penukonda manufacturing facility.', body, '0.8')
 
 # ------------------------------------------------------------------ faq
@@ -741,6 +792,6 @@ def site_files():
     open(os.path.join(ROOT, 'robots.txt'), 'w').write('User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n' % DOMAIN)
 
 if __name__ == '__main__':
-    home(); about(); products_index(); build_products(); biochaargold(); sustainability(); gallery(); blog(); contact()
+    home(); about(); products_index(); build_products(); biochaargold(); sustainability(); applications(); gallery(); blog(); shop(); contact()
     g = faq(); terms(); site_files()
     print(len(PAGES), 'pages;', 'faq groups:', [(x['t'], len(x['q'])) for x in g])

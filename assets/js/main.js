@@ -19,7 +19,7 @@
     });
   });
   document.addEventListener('click', function (e) {
-    $$('.dd.open').forEach(function (d) { if (!d.contains(e.target) && window.innerWidth > 1180) d.classList.remove('open'); });
+    $$('.dd.open').forEach(function (d) { if (!d.contains(e.target) && window.innerWidth > 1279) d.classList.remove('open'); });
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { $$('.dd.open').forEach(function (d) { d.classList.remove('open'); }); var lb = $('.lightbox.open'); if (lb) lb.classList.remove('open'); }

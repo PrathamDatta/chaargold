@@ -6,4 +6,4 @@ Plain HTML/CSS/JS — host the folder on any static host (Vercel, Netlify, cPane
 - Colours/typography: top of `assets/css/style.css` (`--gold:#bc9c23`, `--ink:#040404`).
 - The Contact page has an on-site enquiry form (name, number, optional company, message). It posts to `FORM_ENDPOINT` in `tools/build.py` (currently FormSubmit, which emails contact@chaargold.com; the first submission needs a one-time confirmation click in that inbox). Product pages use `mailto:` buttons.
 - Social links (Instagram, Facebook) are set via `INSTAGRAM` / `FACEBOOK` in `tools/build.py`.
-- `tools/prepare_assets.py`, `tools/prepare_new_assets.py` and `tools/extract_blog.py` were one-off scripts used to import the client's zips.
+- `tools/prepare_assets.py`, `tools/prepare_new_assets.py`, `tools/prepare_update_assets.py` and `tools/extract_blog.py` were one-off scripts used to import the client's zips.
