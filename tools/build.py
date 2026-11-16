@@ -12,7 +12,7 @@ PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
 INSTAGRAM = 'https://www.instagram.com/chaargold'
 FACEBOOK = 'https://www.facebook.com/profile.php?id=61596008200433'
-VER = '7'
+VER = '8'
 
 def esc(s): return html.escape(s, quote=False)
 def load(n): return json.load(open(os.path.join(ROOT, 'data', n), encoding='utf-8'))
