@@ -350,7 +350,7 @@ fieldset.field{border:0;padding:0;margin:0}
 .header .wrap{gap:14px}
 .topbar .tb-right{font:700 .95rem var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
 @media(max-width:640px){.topbar .tb-right{display:block;width:100%;text-align:center;font-size:.9rem}.topbar .tb-left{width:100%;justify-content:center}}
-@media(max-width:1279px){
+@media(max-width:1100px){
   .burger{display:block}
   .nav{position:fixed;inset:0 0 0 auto;width:min(86vw,360px);background:#fff;flex-direction:column;align-items:stretch;gap:0;padding:90px 20px 30px;transform:translateX(100%);visibility:hidden;transition:transform .3s,visibility .3s;box-shadow:-20px 0 60px -20px rgba(0,0,0,.3);overflow:auto;z-index:150}
   .nav.open{transform:none;visibility:visible}
@@ -426,3 +426,12 @@ fieldset.field{border:0;padding:0;margin:0}
 .nav>a,.nav>.dd>button{font-size:.8rem;padding:.7em .5em}
 .brand-text b{font-size:1.4rem}
 .header .brand img{height:58px}
+
+/* ---- round 4 ---- */
+.quote-float{position:fixed;right:18px;bottom:82px;z-index:120;background:var(--ink);color:#fff;text-decoration:none;font:600 .9rem var(--font-body);padding:.85em 1.5em;border-radius:999px;box-shadow:0 10px 30px -8px rgba(0,0,0,.45);border:1px solid var(--gold);transition:transform .2s}
+.quote-float:hover{transform:translateY(-3px);color:var(--gold)}
+@media(max-width:640px){.quote-float{right:14px;bottom:78px;font-size:.85rem}}
+.topbar .tb-right a{color:var(--gold);font-weight:700}
+.topbar .tb-right a:hover{color:#fff}
+.ship-note{font:700 1.05rem var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-deep);margin:1.2rem 0 .2rem}
+.nav>a,.nav>.dd>button{font-size:.92rem;padding:.7em .75em}
