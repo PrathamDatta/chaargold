@@ -7,12 +7,12 @@ import json, os, html, urllib.parse
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOMAIN = 'https://chaargold.com'
 EMAIL = 'contact@chaargold.com'
-FORM_ENDPOINT = 'https://formsubmit.co/ajax/contact@chaargold.com'   # contact-page enquiry form posts here (JSON)
+FORM_ENDPOINT = 'https://formsubmit.co/ajax/shiva@adinet.in'   # contact-page enquiry form posts here (JSON)
 PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
 INSTAGRAM = 'https://www.instagram.com/chaargold'
 FACEBOOK = 'https://www.facebook.com/profile.php?id=61596008200433'
-VER = '14'
+VER = '15'
 
 def esc(s): return html.escape(s, quote=False)
 def load(n): return json.load(open(os.path.join(ROOT, 'data', n), encoding='utf-8'))
