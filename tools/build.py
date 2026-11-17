@@ -12,7 +12,7 @@ PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
 INSTAGRAM = 'https://www.instagram.com/chaargold'
 FACEBOOK = 'https://www.facebook.com/profile.php?id=61596008200433'
-VER = '12'
+VER = '13'
 
 def esc(s): return html.escape(s, quote=False)
 def load(n): return json.load(open(os.path.join(ROOT, 'data', n), encoding='utf-8'))
@@ -827,7 +827,7 @@ def terms():
             out.append('<li><b>%s:</b> %s</li>' % (esc(lab), esc(rest)) if sep and '%' in lab else '<li>%s</li>' % esc(t))
         else: out.append('<p>%s</p>' % esc(t))
     if inul: out.append('</ul>')
-    body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'Terms')], '')}<span class="eyebrow">Legal</span><h1 style="font-size:clamp(1.8rem,3.4vw,2.8rem)">{esc(title.title().replace('&', '&'))}</h1><p class="lead">{esc(eff)}</p></div></section>
+    body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'Terms')], '')}<span class="eyebrow">Legal</span><h1 style="font-size:clamp(1.8rem,3.4vw,2.8rem)">{esc(title.title().replace('&', '&'))}</h1></div></section>
 <section class="section"><div class="narrow terms prose">{''.join(out)}</div></section>'''
     write('terms.html', 'Terms & Conditions', 'Standard terms and conditions of sale, supply, installation and commissioning for CHAARGOLD and BIOCHAARGOLD.', body, '0.3')
 
