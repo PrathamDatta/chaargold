@@ -78,9 +78,10 @@
       e.preventDefault();
       if (!f.checkValidity()) { f.reportValidity(); return; }
       var data = {};
-      $$('input,textarea', f).forEach(function (el) { if (el.name && el.type !== 'checkbox') data[el.name] = el.value.trim(); });
-      var prods = $$('input[name="products"]:checked', f).map(function (el) { return el.value; });
-      if ($('input[name="products"]', f)) data.products_of_interest = prods.length ? prods.join(', ') : '(none selected)';
+      $$('input,textarea,select', f).forEach(function (el) { if (el.name && el.type !== 'checkbox') data[el.name] = el.value.trim(); });
+      var groups = {};
+      $$('input[type="checkbox"]', f).forEach(function (el) { groups[el.name] = groups[el.name] || []; if (el.checked) groups[el.name].push(el.value); });
+      Object.keys(groups).forEach(function (k) { data[k === 'products' ? 'products_of_interest' : k] = groups[k].length ? groups[k].join(', ') : '(none selected)'; });
       data._subject = f.getAttribute('data-subject') || 'Website enquiry';
       data._template = 'table';
       ok.hidden = true; err.hidden = true;
