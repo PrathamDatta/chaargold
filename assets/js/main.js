@@ -78,7 +78,9 @@
       e.preventDefault();
       if (!f.checkValidity()) { f.reportValidity(); return; }
       var data = {};
-      $$('input,textarea', f).forEach(function (el) { if (el.name) data[el.name] = el.value.trim(); });
+      $$('input,textarea', f).forEach(function (el) { if (el.name && el.type !== 'checkbox') data[el.name] = el.value.trim(); });
+      var prods = $$('input[name="products"]:checked', f).map(function (el) { return el.value; });
+      if ($('input[name="products"]', f)) data.products_of_interest = prods.length ? prods.join(', ') : '(none selected)';
       data._subject = f.getAttribute('data-subject') || 'Website enquiry';
       data._template = 'table';
       ok.hidden = true; err.hidden = true;

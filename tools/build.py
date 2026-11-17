@@ -12,7 +12,7 @@ PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
 INSTAGRAM = 'https://www.instagram.com/chaargold'
 FACEBOOK = 'https://www.facebook.com/profile.php?id=61596008200433'
-VER = '9'
+VER = '10'
 
 def esc(s): return html.escape(s, quote=False)
 def load(n): return json.load(open(os.path.join(ROOT, 'data', n), encoding='utf-8'))
@@ -206,6 +206,44 @@ def email_box(title, text, subject, lines, label='Email us'):
             f'<a class="btn btn-line" href="tel:+{PHONE_RAW}">{icon("phone")} {PHONE}</a></div>'
             f'<p class="note">Or write to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p></div>')
 
+QUOTE_PRODUCTS = ['Lump Charcoal', 'Hexagonal Briquettes', 'Pillow Briquettes', 'Honeycomb Briquettes', 'Biochar', 'Wood Vinegar', 'Charcoal Briquette Stoves', 'Pyrolysis Kilns & Retort Systems']
+
+def form_tail(ok_text):
+    return (f'<input type="text" name="_honey" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">'
+            f'<div><button class="btn btn-gold" type="submit">Submit {icon("arrow")}</button></div>'
+            f'<p class="form-msg ok" role="status" hidden>{ok_text}</p>'
+            f'<p class="form-msg err" role="alert" hidden>Sorry, we couldn’t send your message just now. Please call <a href="tel:+{PHONE_RAW}">{PHONE}</a> or write to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>')
+
+def quote_form(pid, product=''):
+    opts = ''.join(f'<label class="opt"><input type="checkbox" name="products" value="{esc(n)}"{" checked" if n == product else ""}> {esc(n)}</label>' for n in QUOTE_PRODUCTS)
+    return f'''<form class="form" id="{pid}-form" data-enquiry data-endpoint="{FORM_ENDPOINT}" data-subject="Quote request from the ChaarGold website">
+<fieldset class="field"><legend>Products of Interest <small>(Select all that apply)</small></legend><div class="opts">{opts}</div></fieldset>
+<p class="form-intro">Whether you are looking for a one-time purchase, regular supply, or customised solutions, ChaarGold is here to help. Share your requirements with us, and we’ll work with you to find the right solution.</p>
+<h4 class="form-h">Contact Information</h4>
+<div class="row"><div class="field"><label for="{pid}-name">Name <i>*</i></label><input id="{pid}-name" name="name" autocomplete="name" required></div><div class="field"><label for="{pid}-company">Company Name</label><input id="{pid}-company" name="company" autocomplete="organization"></div></div>
+<div class="row"><div class="field"><label for="{pid}-email">Email Address</label><input id="{pid}-email" name="email" type="email" autocomplete="email"></div><div class="field"><label for="{pid}-phone">Phone Number <i>*</i></label><input id="{pid}-phone" name="phone" type="tel" autocomplete="tel" required></div></div>
+<h4 class="form-h">Additional Information</h4>
+<div class="field"><label for="{pid}-msg">Tell Us About Your Requirement</label><textarea id="{pid}-msg" name="message"></textarea></div>
+{form_tail('Thank you — your quote request has been sent. Our team will get back to you shortly.')}</form>'''
+
+def callback_form(pid):
+    return f'''<form class="form" id="{pid}-form" data-enquiry data-endpoint="{FORM_ENDPOINT}" data-subject="Call back request from the ChaarGold website">
+<div class="row"><div class="field"><label for="{pid}-name">Name <i>*</i></label><input id="{pid}-name" name="name" autocomplete="name" required></div><div class="field"><label for="{pid}-phone">Contact Number <i>*</i></label><input id="{pid}-phone" name="phone" type="tel" autocomplete="tel" required></div></div>
+<div class="field"><label for="{pid}-time">Best time to call</label><input id="{pid}-time" name="best_time_to_call"></div>
+<div class="field"><label for="{pid}-msg">Tell Us About Your Requirement</label><textarea id="{pid}-msg" name="message"></textarea></div>
+{form_tail('Thank you — we have received your request and will call you back shortly.')}</form>'''
+
+def partner_form(pid):
+    return f'''<form class="form" id="{pid}-form" data-enquiry data-endpoint="{FORM_ENDPOINT}" data-subject="Distribution partner enquiry from the ChaarGold website">
+<div class="row"><div class="field"><label for="{pid}-name">Full Name <i>*</i></label><input id="{pid}-name" name="name" autocomplete="name" required></div><div class="field"><label for="{pid}-company">Company Name</label><input id="{pid}-company" name="company" autocomplete="organization"></div></div>
+<div class="row"><div class="field"><label for="{pid}-region">Country / State</label><input id="{pid}-region" name="region"></div><div class="field"><label for="{pid}-phone">Phone Number <i>*</i></label><input id="{pid}-phone" name="phone" type="tel" autocomplete="tel" required></div></div>
+<div class="field"><label for="{pid}-email">Email Address</label><input id="{pid}-email" name="email" type="email" autocomplete="email"></div>
+<div class="field"><label for="{pid}-msg">Tell Us About Your Interest</label><textarea id="{pid}-msg" name="message"></textarea></div>
+{form_tail('Thank you — your application has been sent. Our team will respond with partnership details.')}</form>'''
+
+def form_box(title, text, form):
+    return f'<div class="form-box"><h3>{title}</h3><p>{text}</p>{form}<p class="note">Or call <a href="tel:+{PHONE_RAW}">{PHONE}</a> · <a href="mailto:{EMAIL}">{EMAIL}</a></p></div>'
+
 def enquiry_section(product='', noun='charcoal'):
     base = '../'
     return f'''<section class="section bg-cream" id="enquire">
@@ -220,7 +258,7 @@ def enquiry_section(product='', noun='charcoal'):
     <div class="split top">
       <div><h3>Request a Quote</h3><p>Please select all products you are interested in purchasing or learning more about. Our team will review your requirements and get back to you with a customised quotation.</p>
       <p>Whether you are looking for a one-time purchase, regular supply, or customised solutions, ChaarGold is here to help. Share your requirements with us, and we’ll work with you to find the right solution.</p></div>
-      {email_box('Request a quote by email', 'Click below and your email app opens with a short template — just fill in your details and send.', 'Quote request — ' + (product or 'ChaarGold products'), ['Products of interest: ' + (product or ''), 'Quantity / capacity:', 'Name:', 'Company:', 'Phone:', 'Country:', 'Tell us about your requirement:'], 'Email your requirement')}
+      {form_box('Request a Quote', 'Select your products and share your details — our team will reply with a customised quotation.', quote_form('q', product))}
     </div>
   </div>
   <div class="tabpanel" role="tabpanel" id="team" aria-labelledby="t-team" hidden>
@@ -230,7 +268,7 @@ def enquiry_section(product='', noun='charcoal'):
           <div class="contact-card"><span class="ico">{icon('whatsapp')}</span><div><h3>Call / WhatsApp</h3><a href="tel:+{PHONE_RAW}">{PHONE}</a></div></div>
           <div class="contact-card"><span class="ico">{icon('mail')}</span><div><h3>Email</h3><a href="mailto:{EMAIL}">{EMAIL}</a></div></div>
         </div></div>
-      {email_box('Request a call back', 'Whether you’re looking for premium charcoal briquettes, premium biochar, or setting up your own Charcoal Pyrolysis Kilns Plant, our team is ready to assist. Email us your name and number and we’ll call you.', 'Call back request', ['Name:', 'Contact number:', 'Best time to call:'], 'Request a call back')}
+      {form_box('Request a call back', 'Whether you’re looking for premium charcoal briquettes, premium biochar, or setting up your own Charcoal Pyrolysis Kilns Plant, our team is ready to assist. Share your name and number and we’ll call you.', callback_form('cb'))}
     </div>
   </div>
   <div class="tabpanel" role="tabpanel" id="partner" aria-labelledby="t-partner" hidden>
@@ -241,7 +279,7 @@ def enquiry_section(product='', noun='charcoal'):
         <h4>Partner benefits</h4>
         {checks(['Exclusive regional opportunities','Competitive pricing and attractive margins','Consistent product quality','Reliable bulk supply capabilities','Marketing and branding support','Export-ready products and packaging','Long-term growth partnerships','Dedicated account and technical support'])}
         <p style="margin-top:1.2rem">Partner with CHAARGOLD to deliver premium charcoal solutions backed by quality, reliability, and performance.</p></div>
-      {email_box('Apply to become a distributor', 'Tell us about your business and the region you serve. Our team will respond with partnership details.', 'Distribution partner enquiry', ['Full name:', 'Company:', 'Country / State:', 'Phone:', 'Tell us about your interest:'], 'Email your application')}
+      {form_box('Apply to become a distributor', 'Tell us about your business and the region you serve. Our team will respond with partnership details.', partner_form('dp'))}
     </div>
   </div>
 </div></section>'''
@@ -726,15 +764,8 @@ def contact():
 <div class="contact-card"><span class="ico">{icon('pin')}</span><div><h3>Our locations</h3><p><b style="color:var(--ink)">Head office</b><br>Bengaluru, Karnataka, India</p><p style="margin:0"><b style="color:var(--ink)">Manufacturing facility</b><br>Penukonda, Andhra Pradesh, India</p></div></div>
 <div class="contact-card"><span class="ico">{icon('instagram')}</span><div><h3>Connect with us</h3><p>Follow CHAARGOLD on social media to stay updated on our products, manufacturing activities, latest developments and carbon solutions.</p><p style="margin:0"><a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a> &nbsp; <a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></p></div></div>
 </div></div>
-<div class="reveal form-box" id="enquiry"><h3>Send us an enquiry</h3><p>Have a specific requirement or project in mind? Leave your details and message below — our team will get in touch to understand your needs and discuss the next steps.</p>
-<form class="form" id="enquiry-form" data-enquiry data-endpoint="{FORM_ENDPOINT}" data-subject="New enquiry from the ChaarGold website">
-<div class="row"><div class="field"><label for="e-name">Name <i>*</i></label><input id="e-name" name="name" autocomplete="name" required></div><div class="field"><label for="e-phone">Contact number <i>*</i></label><input id="e-phone" name="phone" type="tel" autocomplete="tel" required></div></div>
-<div class="field"><label for="e-company">Company name <small>(optional)</small></label><input id="e-company" name="company" autocomplete="organization"></div>
-<div class="field"><label for="e-msg">Message <i>*</i></label><textarea id="e-msg" name="message" required></textarea></div>
-<input type="text" name="_honey" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
-<div><button class="btn btn-gold" type="submit">Submit Enquiry {icon('arrow')}</button></div>
-<p class="form-msg ok" role="status" hidden>Thank you — your enquiry has been sent. Our team will get back to you shortly.</p>
-<p class="form-msg err" role="alert" hidden>Sorry, we couldn’t send your message just now. Please call <a href="tel:+{PHONE_RAW}">{PHONE}</a> or write to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p></form>
+<div class="reveal form-box" id="enquiry"><h3>Request a Quote</h3><p>Please select all products you are interested in purchasing or learning more about. Our team will review your requirements and get back to you with a customised quotation.</p>
+{quote_form('c')}
 <p class="note">We value your interest in CHAARGOLD and look forward to exploring how we can support your business.</p></div></div></div></section>
 <section class="section bg-cream"><div class="wrap"><span class="eyebrow">Contact us</span><h2 style="max-width:820px">Let’s build better carbon solutions together</h2>
 <p class="lead" style="max-width:780px">At CHAARGOLD, we believe in creating value through quality charcoal products, innovative carbon technologies and sustainable solutions. Whether you are looking for premium charcoal briquettes, biochar, pyrolysis and retort kilns/systems, or turnkey solutions for carbon projects, our team is ready to assist.</p></div></section>'''
