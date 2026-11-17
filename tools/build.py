@@ -12,7 +12,7 @@ PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
 INSTAGRAM = 'https://www.instagram.com/chaargold'
 FACEBOOK = 'https://www.facebook.com/profile.php?id=61596008200433'
-VER = '8'
+VER = '9'
 
 def esc(s): return html.escape(s, quote=False)
 def load(n): return json.load(open(os.path.join(ROOT, 'data', n), encoding='utf-8'))
@@ -71,15 +71,15 @@ PRODUCTS = [
       short='Engineered biochar to heal soils, lock carbon for centuries and strengthen agriculture.'),
  dict(slug='pyrolysis-kilns', name='Pyrolysis Kilns & Retort Systems', img='plant-yellow-ducts', tag='Equipment', fill=True,
       short='In-house engineered kilns and turnkey plants for charcoal and biochar production.'),
- dict(slug='goldflame-stoves', name='GoldFlame Charcoal Briquette Stoves', img='goldflame-light', tag='Stoves',
+ dict(slug='goldflame-stoves', name='GoldFlame Charcoal Briquette Stoves', img='goldflame-stove', tag='Stoves',
       short='Designed for more than just grilling and barbecuing, our signature charcoal briquette stoves are ideal for everyday cooking.'),
  dict(slug='wood-vinegar', name='Wood Vinegar', img='wood-vinegar-bottle', tag='By-product',
       short="Nature's liquid solution for sustainable agriculture — pyroligneous acid from our kilns."),
 ]
 P = {p['slug']: p for p in PRODUCTS}
 
-NAV = [('about.html', 'About Us'), ('products/index.html', 'Products'),
-       ('biochaargold.html', 'BIOCHAARGOLD™'), ('applications.html', 'Applications'), ('gallery.html', 'Gallery'), ('sustainability.html', 'Sustainability'),
+NAV = [('index.html', 'Home'), ('about.html', 'About Us'), ('products/index.html', 'Products'),
+       ('biochaargold.html', 'BIOCHAARGOLD™'), ('applications.html', 'Applications'), ('gallery.html', 'Gallery'),
        ('contact.html', 'Contact Us')]
 
 def plink(p, base):
@@ -772,18 +772,19 @@ def faq():
 
 # ------------------------------------------------------------------ terms
 def terms():
-    data = load('terms.json'); out = []; inlist = False; title = ''; eff = ''
-    for s, t in data:
-        if s == 'ListParagraph' and not inlist: out.append('<ol>'); inlist = True
-        elif s != 'ListParagraph' and inlist: out.append('</ol>'); inlist = False
-        if s == 'Heading2' and not title: title = t
-        elif t.startswith('Effective Date'): eff = t
-        elif s == 'Heading3': out.append('<h3>%s</h3>' % esc(t))
-        elif s in ('Heading4', 'Heading5'): out.append('<h4>%s</h4>' % esc(t))
-        elif s == 'ListParagraph': out.append('<li>%s</li>' % esc(t))
-        elif s == 'Heading2': out.append('<h2>%s</h2>' % esc(t))
+    out = []; title = ''; eff = ''; inul = False
+    for k, t in load('terms.json'):
+        if k != 'li' and inul: out.append('</ul>'); inul = False
+        if k == 'title': title = t
+        elif k == 'eff': eff = t
+        elif k == 'h3': out.append('<h3>%s</h3>' % esc(t))
+        elif k == 'h4': out.append('<h4>%s</h4>' % esc(t))
+        elif k == 'li':
+            if not inul: out.append('<ul>'); inul = True
+            lab, sep, rest = t.partition(': ')
+            out.append('<li><b>%s:</b> %s</li>' % (esc(lab), esc(rest)) if sep and '%' in lab else '<li>%s</li>' % esc(t))
         else: out.append('<p>%s</p>' % esc(t))
-    if inlist: out.append('</ol>')
+    if inul: out.append('</ul>')
     body = f'''<section class="page-hero"><div class="wrap">{crumbs([(None, 'Terms')], '')}<span class="eyebrow">Legal</span><h1 style="font-size:clamp(1.8rem,3.4vw,2.8rem)">{esc(title.title().replace('&', '&'))}</h1><p class="lead">{esc(eff)}</p></div></section>
 <section class="section"><div class="narrow terms prose">{''.join(out)}</div></section>'''
     write('terms.html', 'Terms & Conditions', 'Standard terms and conditions of sale, supply, installation and commissioning for CHAARGOLD and BIOCHAARGOLD.', body, '0.3')
