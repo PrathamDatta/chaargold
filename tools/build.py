@@ -12,7 +12,7 @@ PHONE = '+91 81052 70415'
 PHONE_RAW = '918105270415'
 INSTAGRAM = 'https://www.instagram.com/chaargold'
 FACEBOOK = 'https://www.facebook.com/profile.php?id=61596008200433'
-VER = '10'
+VER = '11'
 
 def esc(s): return html.escape(s, quote=False)
 def load(n): return json.load(open(os.path.join(ROOT, 'data', n), encoding='utf-8'))
@@ -208,9 +208,9 @@ def email_box(title, text, subject, lines, label='Email us'):
 
 QUOTE_PRODUCTS = ['Lump Charcoal', 'Hexagonal Briquettes', 'Pillow Briquettes', 'Honeycomb Briquettes', 'Biochar', 'Wood Vinegar', 'Charcoal Briquette Stoves', 'Pyrolysis Kilns & Retort Systems']
 
-def form_tail(ok_text):
+def form_tail(ok_text, label='Submit'):
     return (f'<input type="text" name="_honey" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">'
-            f'<div><button class="btn btn-gold" type="submit">Submit {icon("arrow")}</button></div>'
+            f'<div><button class="btn btn-gold" type="submit">{label} {icon("arrow")}</button></div>'
             f'<p class="form-msg ok" role="status" hidden>{ok_text}</p>'
             f'<p class="form-msg err" role="alert" hidden>Sorry, we couldn’t send your message just now. Please call <a href="tel:+{PHONE_RAW}">{PHONE}</a> or write to <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>')
 
@@ -229,9 +229,7 @@ def quote_form(pid, product=''):
 def callback_form(pid):
     return f'''<form class="form" id="{pid}-form" data-enquiry data-endpoint="{FORM_ENDPOINT}" data-subject="Call back request from the ChaarGold website">
 <div class="row"><div class="field"><label for="{pid}-name">Name <i>*</i></label><input id="{pid}-name" name="name" autocomplete="name" required></div><div class="field"><label for="{pid}-phone">Contact Number <i>*</i></label><input id="{pid}-phone" name="phone" type="tel" autocomplete="tel" required></div></div>
-<div class="field"><label for="{pid}-time">Best time to call</label><input id="{pid}-time" name="best_time_to_call"></div>
-<div class="field"><label for="{pid}-msg">Tell Us About Your Requirement</label><textarea id="{pid}-msg" name="message"></textarea></div>
-{form_tail('Thank you — we have received your request and will call you back shortly.')}</form>'''
+{form_tail('Thank you — we have received your request and will call you back shortly.', 'Request a Call Back')}</form>'''
 
 def partner_form(pid):
     return f'''<form class="form" id="{pid}-form" data-enquiry data-endpoint="{FORM_ENDPOINT}" data-subject="Distribution partner enquiry from the ChaarGold website">
@@ -268,7 +266,7 @@ def enquiry_section(product='', noun='charcoal'):
           <div class="contact-card"><span class="ico">{icon('whatsapp')}</span><div><h3>Call / WhatsApp</h3><a href="tel:+{PHONE_RAW}">{PHONE}</a></div></div>
           <div class="contact-card"><span class="ico">{icon('mail')}</span><div><h3>Email</h3><a href="mailto:{EMAIL}">{EMAIL}</a></div></div>
         </div></div>
-      {form_box('Request a call back', 'Whether you’re looking for premium charcoal briquettes, premium biochar, or setting up your own Charcoal Pyrolysis Kilns Plant, our team is ready to assist. Share your name and number and we’ll call you.', callback_form('cb'))}
+      {form_box('Request a call back', 'Whether you’re looking for premium charcoal briquettes, premium biochar, or setting up your own Charcoal Pyrolysis Kilns Plant, our team is ready to assist.', callback_form('cb'))}
     </div>
   </div>
   <div class="tabpanel" role="tabpanel" id="partner" aria-labelledby="t-partner" hidden>
